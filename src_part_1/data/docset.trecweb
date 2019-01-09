@@ -1,0 +1,578 @@
+<DOC>
+<DOCNO>lists-000-0000000</DOCNO>
+<DOCHDR>
+http://lists.w3.org/Archives/AboutArchives.html
+Connection: close
+Date: Tue, 15 Jun 2004 08:37:39 GMT
+Content-Length: 11892
+Content-Type: text/html
+Etag: "1pj15e7:uu8l86cg"
+Last-Modified: Thu, 11 Sep 2003 15:45:47 GMT
+Server: Jigsaw/2.2.3
+</DOCHDR>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+                      "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+<head>
+  <title>W3C HTML Archives</title>
+  <meta http-equiv="Content-Type" content="text/html">
+</head>
+<body bgcolor="#FFFFFF">
+<a href="http://www.w3.org/"><img alt="W3C"
+src="http://www.w3.org/pub/WWW/Icons/WWW/w3c_home" border="0">
+</a>
+<h1>A brief technical overview of Hypermess: <br>
+the hypertext mailing list archives at W3C</h1>
+<p><em>by Jos� Kahan</em></p>
+<hr>
+<ul>
+  <li><a href="#Hypermess?">Why Hypermess?</a></li>
+  <li><a href="#beginning.">In the beginning...</a></li>
+  <li><a href="#System">System architecture</a></li>
+  <li><a href="#Experience">Experience</a></li>
+  <li><a href="#Availabili">Availability</a></li>
+  <li><a href="#History">History</a></li>
+  <li><a href="#Acknowledg">Acknowledgments</a></li>
+</ul>
+<h2><a name="Hypermess?">Why Hypermess?</a></h2>
+<p>I thought about this name when trying to merge a messaging library called
+mess822 into hypermail. Although I abandonded this track when I joined the
+open source hypermail effort, I decided to stick with the name. It either
+represents the current system (Perl scripts + hypermail + smartlist) or the
+problems I have always have finding time to work on it. </p>
+<p>Previous names of the system were: 1997-1998 DEISS (a breton word meaning
+archive), and HMPP (Hypermail Plus Plus), corresponding to different evolution
+stages.</p>
+<h2><a name="beginning.">In the beginning...</a></h2>
+<p>It all started in January 1997, when  <candidate-0002>dan connolly</candidate-0002>  <candidate-0002>connolly</candidate-0002>  got bored with
+maintaining the www-html mailing list and asked for a replacement. Someone
+pointed a finger at me and as I had never maintained a list, I thought it'd be
+an interesting experience... if I only had known.</p>
+<p>One of my www-html maintainer duties is  to to provide a hypertext mailing
+list archive. However, the system we were using at that time (Mhonarc), broke
+down often and it took too much time to recover from its crashes. Moreover,
+the archives weren't very practical, as they weren't divided into periods.
+(N.B., Mhonarc has evolved since that time and become more robust and offers many new features. I'm only describing the state of things in January 1997).</p>
+<p>So, I started building a more resistent and easier to maintain system (zero
+maintainance). It also gave me an excuse to learn Perl. This rain project came
+out nicely and my W3C teammates asked me if I could install this system on
+their lists too. As this wasn't my initial duty, I learn the meaning of the
+term "juggling with one's time."</p>
+<p>Since then, I've been maintaining the archiving system and improving it,
+whenever I find free time to do so. See the <a href="#History">history</a>
+section for more info.</p>
+<h2><a name="System">System architecture</a></h2>
+<h3>Hardware</h3>
+<p>Our mailing list server runs on a PIII 800 Mhz, 1.5G RAMS and lots
+of hard disk space, both SCSI and IDE (circa 96 GB), and an 
+Intel 8257  EtherExpress Pro Fast Ethernet interface running at 100 Mb/s.</p>
+<h3>Operation system</h3>
+<p>Solaris 2.8 for Intel (Solaris 8 10/00 s28x_u2wos_11 INTEL).</p>
+<h3>Software</h3>
+<p>I have three components:</p>
+<ul>
+  <li>Smartlist
+    <p>Our mailing list server. It may try to be too smart sometimes. However,
+    it's very easy to customize it and allows to call scripts at different
+    stages during the processing of a message.</p>
+  </li>
+  <li>Some front-end Perl scripts (update-archive, update-period)
+    <p>These scripts are responsible for dividing an archive into periods
+    automatically and for detecting and recovering from errors. They stand
+    between Smartlist and hypermail.</p>
+  </li>
+  <li>Hypermail (latest version, last time I looked)
+    <p>The hypertext mail archiver (including in-built MIME handler)</p>
+  </li>
+</ul>
+<p></p>
+<p>The following figure shows the interaction between these different
+components:</p>
+<p><img src="hypermess.png" alt="Interaction between the differe"></p>
+<p>The update-period script is needed because hypermail doesn't know how to
+handle MH mboxes. This script converts a given set of an MH box into an mbox.
+In addition, to be able to detect without unambiguity the beginning of each
+new message, we escape all lines except for the From envelope with a ">" char,
+into an ietf mbox type. Hypermail has an option to deal with this kind of
+mboxes. I know it, as I'm the one who added it :-)</p>
+<h2><a name="Experience">Experience</a></h2>
+<p>I think it has been a good idea to have a front-end script between the
+mailing list server and the mail-to-HTML conversion program. I was able to add
+fault tolerance and archive division features without having to make intensive
+hack in the end-point systems. Finally, if we change any of the end systems,
+it should allow me to setup the same kind of interface and behavior.</p>
+<p>The most delicate problem we have right now is to ensure the persistence of
+links. Hypermail converts each message into a file and people make links to
+these files. If my hypertext archives aren't rebuilt the same way each time,
+I'll break those links. Because of this, upgrades are always delicate,
+dangerous, and stressing. The best solution would be to move to a system where
+messages are referenced by their msgid and list-name, rather than by the
+filename that hypermail makes. This is the direction that we'll try to follow
+for the next version of the system.<br />
+Update: we tried that direction and the code is actually inside the
+public hypermail  and the code is actually inside the
+public hypermail. However people felt very uncomfortable
+with the 16 char URIs (complex to quote on the phone or mail) and we
+came back to the status quo. Instead we added an msgid based mail
+search script that solves that problem. All messaegs sent tou the list
+server include the archive URI quoted that way.</p>
+<p>Working and contributing to the open source hypermail system is a very big
+advantage: more people test it, detect and fix bugs, and add new interesting
+features than what I could do alone. Instead of adding MIME support to the
+patched hypermail I had, I used my time to test the open source hypermail and
+enhance it. One thing I have yet to find out is what will happen when the
+public hypermail includes new features that affect the performance or backward
+compatibility... to be continued.<br />
+Update: the follow up of contributions has worked nicely. However, it means that before installing a new version of hypermail, we have to test it thoroughly. 
+This is not so bad because it helps make hypermail more robust and we can
+contribute our patches whenever we want. It's really useful  to be in the 
+developer's team.</p>
+<h2><a name="Availabili">Availability</a></h2>
+<p>Hypermail is available off the <a
+href="http://www.hypermail.org/">hypermail development center</a>.</p>
+<p> My development version of hypermail as well as my Perl front-end scripts
+are available off W3C's <a href="http://dev.w3.org/">public CVS server</a>.
+The scripts are not yet ready for a public distribution and are quite ad-hoc
+to our server installation.. Use them at your own risk. My current plan is to
+package these scripts and contribute them to the public hypermail base.<br />
+Update: this has not happened because of lack of time. If someone's interested
+in them, mail me.</p>
+<p>As of December 1999, all my patches and changes have been committed to the
+public hypermail version. </p>
+<h2><a name="History">History</a></h2>
+<p>Summer 2003: <a href="http://www.w3.org/2002/03/archives-improvements/">WAI 
+enhancements</a> added to hypermail and starting to be deployed on all the 
+W3C mailing list archives.</p>
+<p>3 January 2000: I find the time to complete the system description page,
+that was started in June 1997.</p>
+<p>1 January 2000: Everything is still working :-)</p>
+<p>22-24 December 1999: Upgrade of all the mailing list archives to the new
+hypermess (around 330 lists, over 6 hours processing time). The archive has a
+new interface, contains a search form, and uses (simple)  CSS.</p>
+<p>November 1999: Live test of the MIME-enabled archives on three W3C mailing
+lists.</p>
+<p>September 1999: Kent Landfield and Daniel Stenberg encourage me to merge
+all my patches into the current development tree. The idea is to minimize the
+number of mutant hypermail versions and to pool our efforts. I get CVS write
+access to the hypermail base and do it. I manage to organize myself so that
+I'm able to work one week per month on hypermail and hypermess. Start worrying
+about making the conversion before the end of the year. Hypermail 1.x has Y2K
+problems.</p>
+<p>August 1999: I start submitting bug fixes, patches to the hypermail mailing
+list.</p>
+<p>Early Summer  1999: Find out there's an open-source hypermail development
+group. Their version already handles MIME. I review their code during two
+weeks and find it's pretty decent. I decided to scratch my hypermail version
+and use my time for testing the public version and port my principal patches
+to it..</p>
+<p>Early 1999: Request for adding MIME-support to hypermail (1.x).
+Re-evaluation of Mhonarc, but still manage to crash it or it's too slow. I
+start to patch hypermail and go up to combining it with the mess822 library.
+Named the system <strong>Hypermess</strong>, to symbolize this merger and also
+to describe how I'm finding time to work on it..</p>
+<p>Rest of 1997-1998: I continue patching hypermail as needed or add new
+features to it whenever I find the time to do so-- which isn't very often. I'm
+frustrated I can't find more time to improve the system.</p>
+<p>June 1997: I write a page to describe the system. The page only has a
+paragraph saying that I'll add more info when I find more time. Mailing list
+maintainers can now customize the main index of their archives.</p>
+<p>April 1997: Deployment of the new archiving system on most of W3C's mailing
+lists. Met Kevin Hughes (hypermail's author) at WWW6, in Santa Clara and
+proposed him my patches. Kevin tells me that hypermail is no longer
+maintained.</p>
+<p>February-March 1997: Development of a Perl script/hypermail (1.x) system
+that allows to auotmatically divide an archive into periods (thus making it
+easier to browse and less time consuming to archive new messages), and with
+some safe-guards so that it can recover automatically from crashes and quickly
+rebuild an archive from scratch. Found and fixed many hypermail bugs (mainly
+sigsev ones).</p>
+<p>January 1997: I become maintainer of the  www-html mailing list. One of my
+tasks is to provide a hypertext archive for the mailing list. At that time, we
+were using Mhonarc. At that time, Mhonarc used to crashed often and recovering
+was expensive. Another problem is that the archive isn't divided into periods.
+The more messages there are in the archive, the more time it takes to add new
+ones or to browse them.  I need something better that will be easier to
+maintain (zero maintainance) and easier to consult..</p>
+<h2><a name="Acknowledg">Acknowledgments</a></h2>
+<p>Thanks to Daniel Stenberg and Kent Landfield for encouraging me to merge my
+propietary hypermail changes into the  <a
+href="http://www.hypermail.org/">hypermail open source project</a> and for
+inviting me to join the hypermail developer's group.</p>
+<p>The following people have contributed either through feedback or
+beta-testing  (hope everyone is cited):</p>
+<ul>
+  <li> <candidate-0161>tim berners-lee</candidate-0161> </li>
+  <li> <candidate-0056>bert bos</candidate-0056> </li>
+  <li>Al Gilman</li>
+  <li>Daniel La Liberte</li>
+  <li> <candidate-0023>gerald oskoboiny</candidate-0023> </li>
+  <li> <candidate-0010>ralph swick</candidate-0010>  <candidate-0010>swick</candidate-0010> </li>
+  <li>Ir�ne Vatton</li>
+  <li>.. and everyone on the hypermail public mailing list.</li>
+</ul>
+<hr>
+<address>
+  <a href="mailto:kahan@w3.org"> <candidate-0018>jose kahan</candidate-0018> </a><br>
+  <a href="http://www.w3.org/Help/Webmaster">Webmaster</a><br>
+  Last update on: Thu, Sep 11, 2003
+</address>
+</body>
+</html>
+</DOC>
+<DOC>
+<DOCNO>lists-000-0012197</DOCNO>
+<DOCHDR>
+http://lists.w3.org/Archives/Public/copras-public/2004JanMar/0000.html
+Cache-Control: max-age=31104000
+Connection: close
+Date: Tue, 15 Jun 2004 08:37:48 GMT
+Content-Length: 5917
+Content-Language: en
+Content-Type: text/html
+Etag: "1bfsetn:vcifshbo"
+Expires: Fri, 10 Jun 2005 08:37:48 GMT
+Last-Modified: Tue, 25 May 2004 00:06:32 GMT
+Server: Jigsaw/2.2.3
+</DOCHDR>
+<?xml version="1.0" encoding="US-ASCII"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=US-ASCII" />
+<meta name="generator" content="hypermail pre-2.1.9, see http://www.hypermail.org/" />
+<title>new list from  <candidate-0022>daigo</candidate-0022>  <candidate-0022>daigo matsubara</candidate-0022>  on 2004-02-13 (copras-public@w3.org from January to March 2004)</title>
+<meta name="Author" content=" <candidate-0022>daigo</candidate-0022>  <candidate-0022>daigo matsubara</candidate-0022>  ( <candidate-0022>daigo</candidate-0022>  <candidate-0022>daigo@w3.org</candidate-0022> )" />
+<meta name="Subject" content="new list" />
+<meta name="Date" content="2004-02-13" />
+<link rel="stylesheet" href="http://www.w3.org/StyleSheets/Mail/public-message" type="text/css" />
+<link rel="alternate stylesheet" title="Shorter view" 
+    href="http://www.w3.org/StyleSheets/Mail/style-short.css" />
+<link rel="help" href="http://lists.w3.org/Help/" />
+<link rel="start" href="../" title= "copras-public@w3.org archives" />
+</head>
+<body>
+<div class="head">
+<map title="Navigation bar to upper levels" id="upper">
+<p>
+   <a href="http://www.w3.org/">W3C home</a> &gt;
+   <a href="http://lists.w3.org/" title="Mailing lists archives">Mailing
+    lists</a> &gt;
+   <a href="http://lists.w3.org/Archives/Public/" title="Public mailing
+lists">Public</a> &gt;
+   <a href="../" title="Index of copras-public@w3.org" rel="start">copras-public@w3.org</a> &gt;
+   <a href="./" rel="contents" title="Messages received in January to March 2004">January to March 2004</a>
+</p>
+</map>
+<h1>new list</h1>
+<!-- received="Fri Feb 13 03:31:25 2004" -->
+<!-- isoreceived="20040213083125" -->
+<!-- sent="Fri, 13 Feb 2004 17:31:24 +0900" -->
+<!-- isosent="20040213083124" -->
+<!-- name=" <candidate-0022>daigo</candidate-0022>  <candidate-0022>daigo matsubara</candidate-0022> " -->
+<!-- email=" <candidate-0022>daigo</candidate-0022>  <candidate-0022>daigo@w3.org</candidate-0022> " -->
+<!-- subject="new list" -->
+<!-- id="nm8isib2xer.wl@natto.w3.mag.keio.ac.jp" -->
+<!-- charset="US-ASCII" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="mailto:copras-public&#64;w3.org?Subject=Re:%20new%20list&amp;In-Reply-To=&lt;nm8isib2xer.wl&#64;natto.w3.mag.keio.ac.jp&gt;&amp;References=&lt;nm8isib2xer.wl&#64;natto.w3.mag.keio.ac.jp&gt;" accesskey="r" title="respond to this message">Respond</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="0001.html" title="Great Geragos: &quot;David Duke is a malignant narcissist.&quot;">Next message</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>:  <candidate-0022>daigo</candidate-0022>  <candidate-0022>daigo matsubara</candidate-0022>  &lt;<a href="mailto: <candidate-0022>daigo</candidate-0022> &#64;w3.org?Subject=Re:%20new%20list&amp;In-Reply-To=&lt;nm8isib2xer.wl&#64;natto.w3.mag.keio.ac.jp&gt;&amp;References=&lt;nm8isib2xer.wl&#64;natto.w3.mag.keio.ac.jp&gt;"> <candidate-0022>daigo</candidate-0022>  <candidate-0022>daigo@w3.org</candidate-0022> </a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: Fri, 13 Feb 2004 17:31:24 +0900</span><br />
+<span id="message-id"><dfn>Message-ID</dfn>: &lt;nm8isib2xer.wl&#64;natto.w3.mag.keio.ac.jp&gt;
+</span><br />
+<span id="to"><dfn>To</dfn>: <a href="mailto:copras-public&#64;w3.org?Subject=Re:%20new%20list&amp;In-Reply-To=&lt;nm8isib2xer.wl&#64;natto.w3.mag.keio.ac.jp&gt;&amp;References=&lt;nm8isib2xer.wl&#64;natto.w3.mag.keio.ac.jp&gt;">copras-public@w3.org</a>
+</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>
+List_Name: copras-public
+Requester_Email: rigo
+ListPurpose: This list is the public mailing-list for the copras
+EU-Project. This project is set up to coach IST-Projects under
+IST-Framework 6 into the standardization process. This list will be
+used to interface publicly with IST-Projects
+Maintaining_Activity: Copras EU-Project
+-- 
+ <candidate-0022>daigo</candidate-0022>  <candidate-0022>daigo matsubara</candidate-0022>  / W3C Systems Team / mailto:<a href="mailto: <candidate-0022>daigo</candidate-0022> &#64;w3.org?Subject=Re:%20new%20list&amp;In-Reply-To=&lt;nm8isib2xer.wl&#64;natto.w3.mag.keio.ac.jp&gt;&amp;References=&lt;nm8isib2xer.wl&#64;natto.w3.mag.keio.ac.jp&gt;"> <candidate-0022>daigo</candidate-0022>  <candidate-0022>daigo@w3.org</candidate-0022> </a>
+</pre>
+<span id="received"><dfn>Received on</dfn> Friday, 13 February 2004 03:31:25 EST</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="0001.html" title="Next message in the list">Great Geragos: "David Duke is a malignant narcissist."</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Mail actions</dfn>: [ <a href="mailto:copras-public&#64;w3.org?Subject=Re:%20new%20list&amp;In-Reply-To=&lt;nm8isib2xer.wl&#64;natto.w3.mag.keio.ac.jp&gt;&amp;References=&lt;nm8isib2xer.wl&#64;natto.w3.mag.keio.ac.jp&gt;">respond to this message</a> ] [ <a href="mailto:copras-public&#64;w3.org">mail a new topic</a> ]</li>
+<li><dfn>Contemporary messages sorted</dfn>: [ <a href="index.html#0" title="Contemporary messages by date">by date</a> ] [ <a href="thread.html#0" title="Contemporary discussion threads">by thread</a> ] [ <a href="subject.html#0" title="Contemporary messages by subject">by subject</a> ] [ <a href="author.html#0" title="Contemporary messages by author">by author</a> ] [ <a href="attachment.html" title="Contemporary messages by attachment">by messages with attachments</a> ]</li>
+<li><dfn>Help</dfn>: [ <a href=
+   "http://lists.w3.org/Help/" accesskey="h" rel="help">How to use the archives</a> ] [ <a href=
+   "http://www.w3.org/Search/Mail/Public/">Search in the archives</a> ]
+</li></ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail pre-2.1.9</a> 
+: Friday, 13 February 2004 03:39:06 EST
+</em></small></p>
+</body>
+</html>
+</DOC>
+<DOC>
+<DOCNO>lists-000-0018533</DOCNO>
+<DOCHDR>
+http://lists.w3.org/Archives/Public/copras-public/2004JanMar/0001.html
+Cache-Control: max-age=31104000
+Connection: close
+Date: Tue, 15 Jun 2004 08:37:46 GMT
+Content-Length: 14124
+Content-Language: en
+Content-Type: text/html
+Etag: "1v15htt:vcn1bl7g"
+Expires: Fri, 10 Jun 2005 08:37:46 GMT
+Last-Modified: Tue, 25 May 2004 01:03:21 GMT
+Server: Jigsaw/2.2.3
+</DOCHDR>
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+<meta name="generator" content="hypermail pre-2.1.9, see http://www.hypermail.org/" />
+<title>David Duke is a malignant narcissist. from Great Geragos on 2004-03-07 (copras-public@w3.org from January to March 2004)</title>
+<meta name="Author" content="Great Geragos (great_geragos@hotmail.com)" />
+<meta name="Subject" content="David Duke is a malignant narcissist." />
+<meta name="Date" content="2004-03-07" />
+<link rel="stylesheet" href="http://www.w3.org/StyleSheets/Mail/public-message" type="text/css" />
+<link rel="alternate stylesheet" title="Shorter view" 
+    href="http://www.w3.org/StyleSheets/Mail/style-short.css" />
+<link rel="help" href="http://lists.w3.org/Help/" />
+<link rel="start" href="../" title= "copras-public@w3.org archives" />
+</head>
+<body>
+<div class="head">
+<map title="Navigation bar to upper levels" id="upper">
+<p>
+   <a href="http://www.w3.org/">W3C home</a> &gt;
+   <a href="http://lists.w3.org/" title="Mailing lists archives">Mailing
+    lists</a> &gt;
+   <a href="http://lists.w3.org/Archives/Public/" title="Public mailing
+lists">Public</a> &gt;
+   <a href="../" title="Index of copras-public@w3.org" rel="start">copras-public@w3.org</a> &gt;
+   <a href="./" rel="contents" title="Messages received in January to March 2004">January to March 2004</a>
+</p>
+</map>
+<h1>David Duke is a malignant narcissist.</h1>
+<!-- received="Sun Mar  7 06:03:23 2004" -->
+<!-- isoreceived="20040307110323" -->
+<!-- sent="Sun, 07 Mar 2004 11:00:51 +0000" -->
+<!-- isosent="20040307110051" -->
+<!-- name="Great Geragos" -->
+<!-- email="great_geragos@hotmail.com" -->
+<!-- subject="David Duke is a malignant narcissist." -->
+<!-- id="Law10-F5Z9aZ1i6bdVJ0004cdbc@hotmail.com" -->
+<!-- expires="-1" -->
+<map id="navbar" name="navbar">
+<ul class="links">
+<li>
+<dfn>This message</dfn>:
+[ <a href="#start" name="options1" id="options1" tabindex="1">Message body</a> ]
+ [ <a href="mailto:copras-public&#64;w3.org?Subject=Re:%20David%20Duke%20is%20a%20malignant%20narcissist.&amp;In-Reply-To=&lt;Law10-F5Z9aZ1i6bdVJ0004cdbc&#64;hotmail.com&gt;&amp;References=&lt;Law10-F5Z9aZ1i6bdVJ0004cdbc&#64;hotmail.com&gt;" accesskey="r" title="respond to this message">Respond</a> ]
+ [ <a href="#options2">More options</a> ]
+</li>
+<li>
+<dfn>Related messages</dfn>:
+<!-- unext="start" -->
+[ <a href="0002.html" title="Scott: &quot;test&quot;">Next message</a> ]
+[ <a href="0000.html" title=" <candidate-0022>daigo</candidate-0022>  <candidate-0022>daigo matsubara</candidate-0022> : &quot;new list&quot;">Previous message</a> ]
+<!-- unextthread="start" -->
+<!-- ureply="end" -->
+</li>
+</ul>
+</map>
+</div>
+<!-- body="start" -->
+<div class="mail">
+<address class="headers">
+<span id="from">
+<dfn>From</dfn>: Great Geragos &lt;<a href="mailto:great_geragos&#64;hotmail.com?Subject=Re:%20David%20Duke%20is%20a%20malignant%20narcissist.&amp;In-Reply-To=&lt;Law10-F5Z9aZ1i6bdVJ0004cdbc&#64;hotmail.com&gt;&amp;References=&lt;Law10-F5Z9aZ1i6bdVJ0004cdbc&#64;hotmail.com&gt;">great_geragos@hotmail.com</a>&gt;
+</span><br />
+<span id="date"><dfn>Date</dfn>: Sun, 07 Mar 2004 11:00:51 +0000</span><br />
+<span id="to"><dfn>To</dfn>: <a href="mailto:copras-public&#64;w3.org?Subject=Re:%20David%20Duke%20is%20a%20malignant%20narcissist.&amp;In-Reply-To=&lt;Law10-F5Z9aZ1i6bdVJ0004cdbc&#64;hotmail.com&gt;&amp;References=&lt;Law10-F5Z9aZ1i6bdVJ0004cdbc&#64;hotmail.com&gt;">copras-public@w3.org</a>, <a href="mailto:xmlp-comments&#64;w3.org?Subject=Re:%20David%20Duke%20is%20a%20malignant%20narcissist.&amp;In-Reply-To=&lt;Law10-F5Z9aZ1i6bdVJ0004cdbc&#64;hotmail.com&gt;&amp;References=&lt;Law10-F5Z9aZ1i6bdVJ0004cdbc&#64;hotmail.com&gt;">xmlp-comments@w3.org</a>
+</span><br />
+<span id="message-id"><dfn>Message-ID</dfn>: &lt;Law10-F5Z9aZ1i6bdVJ0004cdbc&#64;hotmail.com&gt;
+</span><br />
+</address>
+<pre id="body">
+<a name="start" accesskey="j" id="start"></a>
+David Duke is a malignant narcissist.
+He invents and then projects a false, fictitious, self for the world to 
+fear, or to admire. He maintains a tenuous grasp on reality to start with 
+and the trappings of power further exacerbate this. Real life authority and 
+David Duke�s predilection to surround him with obsequious sycophants support 
+David Duke�s grandiose self-delusions and fantasies of omnipotence and 
+omniscience.
+David Duke's personality is so precariously balanced that he cannot tolerate 
+even a hint of criticism and disagreement. Most narcissists are paranoid and 
+suffer from ideas of reference (the delusion that they are being mocked or 
+discussed when they are not). Thus, narcissists often regard themselves as 
+&quot;victims of persecution&quot;.
+Duke fosters and encourages a personality cult with all the hallmarks of an 
+institutional religion: priesthood, rites, rituals, temples, worship, 
+catechism, and mythology. The leader is this religion's ascetic saint. He 
+monastically denies himself earthly pleasures (or so he claims) in order to 
+be able to dedicate himself fully to his calling.
+Duke is a monstrously inverted Jesus, sacrificing his life and denying 
+himself so that his people - or humanity at large - should benefit. By 
+surpassing and suppressing his humanity, Duke became a distorted version of 
+Nietzsche's &quot;superman&quot;.
+But being a-human or super-human also means being a-sexual and a-moral.
+In this restricted sense, narcissistic leaders are post-modernist and moral 
+relativists. They project to the masses an androgynous figure and enhance it 
+by engendering the adoration of nudity and all things &quot;natural&quot; - or by 
+strongly repressing these feelings. But what they refer to, as &quot;nature&quot; is 
+not natural at all.
+Duke invariably proffers an aesthetic of decadence and evil carefully 
+orchestrated and artificial - though it is not perceived this way by him or 
+by his followers. Narcissistic leadership is about reproduced copies, not 
+about originals. It is about the manipulation of symbols - not about 
+veritable atavism or true conservatism.
+In short: narcissistic leadership is about theatre, not about life. To enjoy 
+the spectacle (and be subsumed by it), the leader demands the suspension of 
+judgment, depersonalization, and de-realization. Catharsis is tantamount, in 
+this narcissistic dramaturgy, to self-annulment.
+Narcissism is nihilistic not only operationally, or ideologically. Its very 
+language and narratives are nihilistic. Narcissism is conspicuous nihilism - 
+and the cult's leader serves as a role model, annihilating the Man, only to 
+re-appear as a pre-ordained and irresistible force of nature.
+Narcissistic leadership often poses as a rebellion against the &quot;old ways&quot; - 
+against the hegemonic culture, the upper classes, the established religions, 
+the superpowers, the corrupt order. Narcissistic movements are puerile, a 
+reaction to narcissistic injuries inflicted upon David Duke like (and rather 
+psychopathic) toddler nation-state, or group, or upon the leader.
+Minorities or &quot;others&quot; - often arbitrarily selected - constitute a perfect, 
+easily identifiable, embodiment of all that is &quot;wrong&quot;. They are accused of 
+being old, they are eerily disembodied, they are cosmopolitan, they are part 
+of the establishment, they are &quot;decadent&quot;, they are hated on religious and 
+socio-economic grounds, or because of their race, sexual orientation, origin 
+... They are different, they are narcissistic (feel and act as morally 
+superior), they are everywhere, they are defenseless, they are credulous, 
+they are adaptable (and thus can be co-opted to collaborate in their own 
+destruction). They are the perfect hate figure. Narcissists thrive on hatred 
+and pathological envy.
+This is precisely the source of the fascination with Hitler, diagnosed by 
+Erich Fromm - together with Stalin - as a malignant narcissist. He was an 
+inverted human. His unconscious was his conscious. He acted out our most 
+repressed drives, fantasies, and wishes. He provides us with a glimpse of 
+the horrors that lie beneath the veneer, the barbarians at our personal 
+gates, and what it was like before we invented civilization. Hitler forced 
+us all through a time warp and many did not emerge. He was not the devil. He 
+was one of us. He was what Arendt aptly called the banality of evil. Just an 
+ordinary, mentally disturbed, failure, a member of a mentally disturbed and 
+failing nation, who lived through disturbed and failing times. He was the 
+perfect mirror, a channel, a voice, and the very depth of our souls.
+Duke prefers the sparkle and glamour of well-orchestrated illusions to the 
+tedium and method of real accomplishments. His reign is all smoke and 
+mirrors, devoid of substances, consisting of mere appearances and mass 
+delusions. In the aftermath of his regime - Duke having died, been deposed, 
+or voted out of office - it all unravels. The tireless and constant 
+prestidigitation ceases and the entire edifice crumbles. What looked like an 
+economic miracle turns out to have been a fraud-laced bubble. Loosely held 
+empires disintegrate. Laboriously assembled business conglomerates go to 
+pieces. &quot;Earth shattering&quot; and &quot;revolutionary&quot; scientific discoveries and 
+theories are discredited. Social experiments end in mayhem.
+It is important to understand that the use of violence must be ego-syntonic. 
+It must accord with the self-image of David Duke. It must abet and sustain 
+his grandiose fantasies and feed his sense of entitlement. It must conform 
+David Duke like narrative. Thus, David Duke who regards himself as the 
+benefactor of the poor, a member of the common folk, the representative of 
+the disenfranchised, the champion of the dispossessed against the corrupt 
+elite - is highly unlikely to use violence at first. The pacific mask 
+crumbles when David Duke has become convinced that the very people he 
+purported to speak for, his constituency, his grassroots fans, and the prime 
+sources of his narcissistic supply - have turned against him. At first, in a 
+desperate effort to maintain the fiction underlying his chaotic personality, 
+David Duke strives to explain away the sudden reversal of sentiment. &quot;The 
+people are being duped by (the media, big industry, the military, the elite, 
+etc.)&quot;, &quot;they don't really know what they are doing&quot;, &quot;following a rude 
+awakening, they will revert to form&quot;, etc. When these flimsy attempts to 
+patch a tattered personal mythology fail, David Duke becomes injured. 
+Narcissistic injury inevitably leads to narcissistic rage and to a 
+terrifying display of unbridled aggression. The pent-up frustration and hurt 
+translate into devaluation. That which was previously idealized - is now 
+discarded with contempt and hatred. This primitive defense mechanism is 
+called &quot;splitting&quot;. To David Duke, things and people are either entirely bad 
+(evil) or entirely good. He projects onto others his own shortcomings and 
+negative emotions, thus becoming a totally good object. Duke is likely to 
+justify the butchering of his own people by claiming that they intended to 
+kill him, undo the revolution, devastate the economy, or the country, etc. 
+The &quot;small people&quot;, the &quot;rank and file&quot;, and the &quot;loyal soldiers&quot; of David 
+Duke - his flock, his nation, and his employees - they pay the price. The 
+disillusionment and disenchantment are agonizing. The process of 
+reconstruction, of rising from the ashes, of overcoming the trauma of having 
+been deceived, exploited and manipulated - is drawn-out. It is difficult to 
+trust again, to have faith, to love, to be led, to collaborate. Feelings of 
+shame and guilt engulf the erstwhile followers of David Duke. This is his 
+sole legacy: a massive post-traumatic stress disorder.
+_________________________________________________________________
+Find things fast with the new MSN Toolbar � includes FREE pop-up blocking! 
+<a href="http://clk.atdmt.com/AVE/go/onm00200414ave/direct/01/">http://clk.atdmt.com/AVE/go/onm00200414ave/direct/01/</a>
+</pre>
+<span id="received"><dfn>Received on</dfn> Sunday,  7 March 2004 06:03:23 EST</span>
+</div>
+<!-- body="end" -->
+<div class="foot">
+<map id="navbarfoot" name="navbarfoot" title="Related messages">
+<ul class="links">
+<li><dfn>This message</dfn>: [ <a href="#start">Message body</a> ]</li>
+<!-- lnext="start" -->
+<li><dfn>Next message</dfn>: <a href="0002.html" title="Next message in the list">Scott: "test"</a></li>
+<li><dfn>Previous message</dfn>: <a href="0000.html" title="Previous message in the list"> <candidate-0022>daigo</candidate-0022>  <candidate-0022>daigo matsubara</candidate-0022> : "new list"</a></li>
+<!-- lnextthread="start" -->
+<!-- lreply="end" -->
+</ul>
+<ul class="links">
+<li><a name="options2" id="options2"></a><dfn>Mail actions</dfn>: [ <a href="mailto:copras-public&#64;w3.org?Subject=Re:%20David%20Duke%20is%20a%20malignant%20narcissist.&amp;In-Reply-To=&lt;Law10-F5Z9aZ1i6bdVJ0004cdbc&#64;hotmail.com&gt;&amp;References=&lt;Law10-F5Z9aZ1i6bdVJ0004cdbc&#64;hotmail.com&gt;">respond to this message</a> ] [ <a href="mailto:copras-public&#64;w3.org">mail a new topic</a> ]</li>
+<li><dfn>Contemporary messages sorted</dfn>: [ <a href="index.html#1" title="Contemporary messages by date">by date</a> ] [ <a href="thread.html#1" title="Contemporary discussion threads">by thread</a> ] [ <a href="subject.html#1" title="Contemporary messages by subject">by subject</a> ] [ <a href="author.html#1" title="Contemporary messages by author">by author</a> ] [ <a href="attachment.html" title="Contemporary messages by attachment">by messages with attachments</a> ]</li>
+<li><dfn>Help</dfn>: [ <a href=
+   "http://lists.w3.org/Help/" accesskey="h" rel="help">How to use the archives</a> ] [ <a href=
+   "http://www.w3.org/Search/Mail/Public/">Search in the archives</a> ]
+</li></ul>
+</map>
+</div>
+<!-- trailer="footer" -->
+<p><small><em>
+This archive was generated by <a href="http://www.hypermail.org/">hypermail pre-2.1.9</a> 
+: Sunday,  7 March 2004 06:03:55 EST
+</em></small></p>
+</body>
+</html>
+</DOC>

@@ -1,0 +1,37 @@
+<top>
+<num> Number: 901
+<title> Hong Kong economics Singapore
+<desc> Description: 
+Find articles discussing the comparison of economics development of 
+Hong Kong and Singapore in 1980s and 1990s.
+<narr> Narrative: 
+A relevant document must contain specific comparison of two areas.
+</top>
+
+<top>
+<num> Number: 902
+<title> Homosexual acceptance Europe
+<desc> Description: 
+Find articles discussing the European countries' attitude to homosexual people.
+<narr> Narrative: 
+A relevant document must contain specific data statistics on homosexual people
+in European countries, or information of related policies.
+</top>
+
+<top>
+<num> Number: 903
+<title> Star Trek "The Next Generation"
+<desc> Description: 
+Find reports related to the specific episodes of star trek "the next generation".
+<narr> Narrative: 
+Other star trek episodes or movies are not relevant.
+</top>
+
+<top>
+<num> Number: 904
+<title> Progressive Dysphagia 
+<desc> Description: 
+Does progressive dysphagia happen a lot among teenagers?
+<narr> Narrative: 
+Relevant information includes related statistics, e.g. rate among teens.
+</top>
