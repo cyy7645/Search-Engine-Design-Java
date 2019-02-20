@@ -1,13 +1,3 @@
-该项目为一个搜索引擎的后端，可以根据query返回20篇文档。
-
-分成4部分
-1. 主要是对原数据的预处理，包括分词，大小写转换，去除停用词，stem保留词干等。
-2. 为整个语料库建立倒排索引，方便快速查询和后期建模。
-3. 建立概率语言模型，根据query返回top N篇文章。
-4. 建立反馈系统，进一步提升模型性能。
-
-ps:
-原始语料库过大，只保留了其中一小部分。
 
 It’s a search engine for e-books in the library in School of Information Science at University of Pittsburgh. It’s going for finding the similar documents based on users’ input, the input could be keywords or the whole document. So I started with 6 gigabyte HTML documents. 
 
@@ -35,3 +25,16 @@ So finally I use Dirichlet Priors method as my model because it brings a little 
 
 part 4: 
 The final step is that I created a pseudo relevance feedback system. I obtained top K documents in the last step with language model. I treated them as relevant documents. For each query term qi, I calculated the probability of feedback documents generating this term. I also calculated the probability of one document generating query term. And I combined these two parts together with parameter lambda as final model. Get top N documents as results.
+
+
+Chinese version:
+该项目为一个搜索引擎的后端，可以根据query返回20篇文档。
+
+分成4部分
+1. 主要是对原数据的预处理，包括分词，大小写转换，去除停用词，stem保留词干等。
+2. 为整个语料库建立倒排索引，方便快速查询和后期建模。
+3. 建立概率语言模型，根据query返回top N篇文章。
+4. 建立反馈系统，进一步提升模型性能。
+
+ps:
+原始语料库过大，只保留了其中一小部分。
